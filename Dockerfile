@@ -1,22 +1,21 @@
 FROM python:3.10
 
-# Set working directory
 WORKDIR /app
 
-# Copy app files
-COPY app.py .
+# Copy files into container
 COPY requirements.txt .
-COPY .streamlit/ .streamlit/   # ✅ Copy the config explicitly
-
-# Set environment variable so Streamlit uses this config
-ENV STREAMLIT_CONFIG_DIR=/app/.streamlit
+COPY app.py .
+COPY .streamlit/ .streamlit/
 
 # Install dependencies
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install -r requirements.txt
 
-# Expose port
+# Avoid permission error by setting working config directory
+ENV STREAMLIT_HOME=/app
+ENV STREAMLIT_CONFIG_FILE="/app/.streamlit/config.toml"
+
 EXPOSE 7860
 
-# Run the Streamlit app
-CMD ["streamlit", "run", "app.py", "--server.port=7860", "--server.enableCORS=false"]
+CMD ["streamlit", "run", "app.py", "--server.port=7860"]
+
